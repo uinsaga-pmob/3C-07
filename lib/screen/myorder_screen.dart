@@ -182,7 +182,7 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
             color: Colors.black,
             borderRadius: BorderRadius.circular(20),
             image: const DecorationImage(
-              image: AssetImage('assets/film_bg.jpg'),
+              image: AssetImage('assets/film2/Adot.jpg'),
               fit: BoxFit.cover,
               colorFilter: ColorFilter.mode(
                 Colors.black54,

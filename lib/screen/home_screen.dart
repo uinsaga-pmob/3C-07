@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'detail/detail_gatotkaca.dart'; // Import halaman detail Gatotkaca
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -24,6 +25,13 @@ class HomeScreen extends StatelessWidget {
               'assets/logo.png',
               height: 40,
               width: 40,
+              errorBuilder: (context, error, stackTrace) {
+                return const Icon(
+                  Icons.movie,
+                  color: Colors.white,
+                  size: 40,
+                );
+              },
             ),
           ),
         ],
@@ -50,17 +58,21 @@ class HomeScreen extends StatelessWidget {
                     children: [
                       Expanded(
                         child: _buildMovieCard(
-                          imagePath: 'assets/film/peaky_blinders.jpg',
-                          title: 'Peaky Blinders',
+                          context: context,
+                          imagePath: 'assets/film/Gatotkaca.jpg',
+                          title: 'Gatotkaca',
                           height: 200,
+                          movieId: 'gatotkaca',
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: _buildMovieCard(
-                          imagePath: 'assets/film/priest.jpg',
+                          context: context,
+                          imagePath: 'assets/film/priest.png',
                           title: 'Priest',
                           height: 200,
+                          movieId: 'gatotkaca',
                         ),
                       ),
                     ],
@@ -90,17 +102,21 @@ class HomeScreen extends StatelessWidget {
                     children: [
                       Expanded(
                         child: _buildMovieCard(
-                          imagePath: 'assets/film/night_has_come.jpg',
-                          title: 'Night Has Come',
+                          context: context,
+                          imagePath: 'assets/film/peakblinders.png',
+                          title: 'Peaky blinders',
                           height: 180,
+                          movieId: 'gatotkaca',
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: _buildMovieCard(
-                          imagePath: 'assets/film/sweet_home.jpg',
-                          title: 'Sweet Home',
+                          context: context,
+                          imagePath: 'assets/film/Gowok.jpg',
+                          title: 'Gowok',
                           height: 180,
+                          movieId: 'gatotkaca',
                         ),
                       ),
                     ],
@@ -127,9 +143,11 @@ class HomeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   _buildFeaturedMovie(
-                    imagePath: 'assets/film/six_millers.jpg',
-                    title: 'SHOP FOR SIX MILLERS',
+                    context: context,
+                    imagePath: 'assets/film/Bangkitnya mayit.jpg',
+                    title: 'Bangkitnya mayit',
                     description: 'Film aksi terbaru dengan cerita yang menegangkan',
+                    movieId: 'gatotkaca',
                   ),
                 ],
               ),
@@ -156,19 +174,41 @@ class HomeScreen extends StatelessWidget {
                       itemCount: 5,
                       itemBuilder: (context, index) {
                         final movies = [
-                          {'title': 'Film 1', 'image': 'assets/film/movie1.jpg'},
-                          {'title': 'Film 2', 'image': 'assets/film/movie2.jpg'},
-                          {'title': 'Film 3', 'image': 'assets/film/movie3.jpg'},
-                          {'title': 'Film 4', 'image': 'assets/film/movie4.jpg'},
-                          {'title': 'Film 5', 'image': 'assets/film/movie5.jpg'},
+                          {
+                            'title': 'Pangku', 
+                            'image': 'assets/film/Pangku.jpg',
+                            'id': 'gatotkaca'
+                          },
+                          {
+                            'title': 'Sosok ketiga', 
+                            'image': 'assets/film/Sosok ketiga.jpg',
+                            'id': 'gatotkaca'
+                          },
+                          {
+                            'title': 'Syirik', 
+                            'image': 'assets/film/Syirik.jpg',
+                            'id': 'gatotkaca'
+                          },
+                          {
+                            'title': 'The nun', 
+                            'image': 'assets/film/The nun.jpg',
+                            'id': 'gatotkaca'
+                          },
+                          {
+                            'title': 'The conjuring', 
+                            'image': 'assets/film/The conjuring.jpg',
+                            'id': 'gatotkaca'
+                          },
                         ];
                         return Padding(
                           padding: const EdgeInsets.only(right: 12.0),
                           child: _buildMovieCard(
+                            context: context,
                             imagePath: movies[index]['image']!,
                             title: movies[index]['title']!,
                             height: 140,
                             width: 100,
+                            movieId: movies[index]['id']!,
                           ),
                         );
                       },
@@ -186,13 +226,16 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildMovieCard({
+    required BuildContext context,
     required String imagePath,
     required String title,
     required double height,
     double? width,
+    required String movieId,
   }) {
     return GestureDetector(
       onTap: () {
+        _navigateToMovieDetail(context, movieId);
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -234,12 +277,15 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildFeaturedMovie({
+    required BuildContext context,
     required String imagePath,
     required String title,
     required String description,
+    required String movieId,
   }) {
     return GestureDetector(
       onTap: () {
+        _navigateToMovieDetail(context, movieId);
       },
       child: Container(
         width: double.infinity,
@@ -278,7 +324,7 @@ class HomeScreen extends StatelessWidget {
                   begin: Alignment.bottomCenter,
                   end: Alignment.topCenter,
                   colors: [
-                    Colors.black.withValues(alpha:0.8),
+                    Colors.black.withValues(alpha: 204), // 0.8 opacity = 204/255
                     Colors.transparent,
                   ],
                 ),
@@ -308,6 +354,101 @@ class HomeScreen extends StatelessWidget {
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Fungsi untuk navigasi ke halaman detail berdasarkan movieId
+  void _navigateToMovieDetail(BuildContext context, String movieId) {
+    switch (movieId) {
+      case 'gatotkaca':
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const DetailGatotkaca(),
+          ),
+        );
+        break;
+      default:
+        // Untuk film lain, gunakan halaman detail default
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => _buildDefaultDetailPage(context, movieId),
+          ),
+        );
+        break;
+    }
+  }
+
+  // Halaman detail default untuk film yang belum memiliki halaman khusus
+  // Tambahkan parameter BuildContext
+  Widget _buildDefaultDetailPage(BuildContext context, String movieId) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.black,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: const Text(
+          'Movie Details',
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              height: 300,
+              width: double.infinity,
+              color: Colors.grey[300],
+              child: const Center(
+                child: Icon(
+                  Icons.movie,
+                  size: 100,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    movieId.replaceAll('_', ' ').toUpperCase(),
+                    style: const TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Detail film akan ditampilkan di sini.',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.black87,
+                    ),
                   ),
                 ],
               ),
