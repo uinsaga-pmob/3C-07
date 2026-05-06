@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'detail/detail_gatotkaca.dart'; // Import halaman detail Gatotkaca
+import 'detail/detail_movie.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -26,11 +26,7 @@ class HomeScreen extends StatelessWidget {
               height: 40,
               width: 40,
               errorBuilder: (context, error, stackTrace) {
-                return const Icon(
-                  Icons.movie,
-                  color: Colors.white,
-                  size: 40,
-                );
+                return const Icon(Icons.movie, color: Colors.white, size: 40);
               },
             ),
           ),
@@ -40,19 +36,14 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Section 1: Peaky Blinders & Priest
+            // Section 1: Film Populer
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Film Populer',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  const Text('Film Populer',
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 16),
                   Row(
                     children: [
@@ -72,7 +63,7 @@ class HomeScreen extends StatelessWidget {
                           imagePath: 'assets/film/priest.png',
                           title: 'Priest',
                           height: 200,
-                          movieId: 'gatotkaca',
+                          movieId: 'priest',
                         ),
                       ),
                     ],
@@ -80,23 +71,17 @@ class HomeScreen extends StatelessWidget {
                 ],
               ),
             ),
-            
-            // Divider
+
             const Divider(thickness: 2),
-            
-            // Section 2: Night Has Come & Sweet Home
+
+            // Section 2: Terbaru
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Terbaru',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  const Text('Terbaru',
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 16),
                   Row(
                     children: [
@@ -104,9 +89,9 @@ class HomeScreen extends StatelessWidget {
                         child: _buildMovieCard(
                           context: context,
                           imagePath: 'assets/film/peakblinders.png',
-                          title: 'Peaky blinders',
+                          title: 'Peaky Blinders',
                           height: 180,
-                          movieId: 'gatotkaca',
+                          movieId: 'peakblinders',
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -116,7 +101,7 @@ class HomeScreen extends StatelessWidget {
                           imagePath: 'assets/film/Gowok.jpg',
                           title: 'Gowok',
                           height: 180,
-                          movieId: 'gatotkaca',
+                          movieId: 'gowok',
                         ),
                       ),
                     ],
@@ -124,48 +109,37 @@ class HomeScreen extends StatelessWidget {
                 ],
               ),
             ),
-            
-            // Divider
+
             const Divider(thickness: 2),
-            
-            // Section 3: SHOP FOR SIX MILLERS
+
+            // Section 3: Rekomendasi
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Rekomendasi',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  const Text('Rekomendasi',
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 16),
                   _buildFeaturedMovie(
                     context: context,
                     imagePath: 'assets/film/Bangkitnya mayit.jpg',
-                    title: 'Bangkitnya mayit',
+                    title: 'Bangkitnya Mayit',
                     description: 'Film aksi terbaru dengan cerita yang menegangkan',
-                    movieId: 'gatotkaca',
+                    movieId: 'bangkitnya',
                   ),
                 ],
               ),
             ),
-            
-            // Additional Movies Section
+
+            // Section 4: Lainnya
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Lainnya',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  const Text('Lainnya',
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 16),
                   SizedBox(
                     height: 150,
@@ -174,31 +148,11 @@ class HomeScreen extends StatelessWidget {
                       itemCount: 5,
                       itemBuilder: (context, index) {
                         final movies = [
-                          {
-                            'title': 'Pangku', 
-                            'image': 'assets/film/Pangku.jpg',
-                            'id': 'gatotkaca'
-                          },
-                          {
-                            'title': 'Sosok ketiga', 
-                            'image': 'assets/film/Sosok ketiga.jpg',
-                            'id': 'gatotkaca'
-                          },
-                          {
-                            'title': 'Syirik', 
-                            'image': 'assets/film/Syirik.jpg',
-                            'id': 'gatotkaca'
-                          },
-                          {
-                            'title': 'The nun', 
-                            'image': 'assets/film/The nun.jpg',
-                            'id': 'gatotkaca'
-                          },
-                          {
-                            'title': 'The conjuring', 
-                            'image': 'assets/film/The conjuring.jpg',
-                            'id': 'gatotkaca'
-                          },
+                          {'title': 'Pangku',       'image': 'assets/film/Pangku.jpg',        'id': 'pangku'},
+                          {'title': 'Sosok Ketiga', 'image': 'assets/film/Sosok ketiga.jpg',  'id': 'ketiga'},
+                          {'title': 'Syirik',       'image': 'assets/film/Syirik.jpg',        'id': 'syirik'},
+                          {'title': 'The Nun',      'image': 'assets/film/The nun.jpg',       'id': 'nun'},
+                          {'title': 'The Conjuring','image': 'assets/film/The conjuring.jpg', 'id': 'conjuring'},
                         ];
                         return Padding(
                           padding: const EdgeInsets.only(right: 12.0),
@@ -217,7 +171,7 @@ class HomeScreen extends StatelessWidget {
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 20),
           ],
         ),
@@ -234,9 +188,7 @@ class HomeScreen extends StatelessWidget {
     required String movieId,
   }) {
     return GestureDetector(
-      onTap: () {
-        _navigateToMovieDetail(context, movieId);
-      },
+      onTap: () => _navigateToMovieDetail(context, movieId, title, imagePath),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -252,11 +204,7 @@ class HomeScreen extends StatelessWidget {
                   height: height,
                   width: width,
                   color: Colors.grey[300],
-                  child: const Icon(
-                    Icons.movie,
-                    size: 40,
-                    color: Colors.grey,
-                  ),
+                  child: const Icon(Icons.movie, size: 40, color: Colors.grey),
                 );
               },
             ),
@@ -264,10 +212,7 @@ class HomeScreen extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             title,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -284,9 +229,7 @@ class HomeScreen extends StatelessWidget {
     required String movieId,
   }) {
     return GestureDetector(
-      onTap: () {
-        _navigateToMovieDetail(context, movieId);
-      },
+      onTap: () => _navigateToMovieDetail(context, movieId, title, imagePath),
       child: Container(
         width: double.infinity,
         height: 220,
@@ -307,11 +250,7 @@ class HomeScreen extends StatelessWidget {
                   return Container(
                     color: Colors.grey[800],
                     child: const Center(
-                      child: Icon(
-                        Icons.movie,
-                        size: 60,
-                        color: Colors.white,
-                      ),
+                      child: Icon(Icons.movie, size: 60, color: Colors.white),
                     ),
                   );
                 },
@@ -324,7 +263,7 @@ class HomeScreen extends StatelessWidget {
                   begin: Alignment.bottomCenter,
                   end: Alignment.topCenter,
                   colors: [
-                    Colors.black.withValues(alpha: 204), // 0.8 opacity = 204/255
+                    Colors.black.withValues(alpha: 204),
                     Colors.transparent,
                   ],
                 ),
@@ -337,24 +276,16 @@ class HomeScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
+                  Text(title,
+                      style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white)),
                   const SizedBox(height: 8),
-                  Text(
-                    description,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.white70,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  Text(description,
+                      style: const TextStyle(fontSize: 16, color: Colors.white70),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis),
                 ],
               ),
             ),
@@ -364,69 +295,75 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  // Fungsi untuk navigasi ke halaman detail berdasarkan movieId
-  void _navigateToMovieDetail(BuildContext context, String movieId) {
-    switch (movieId) {
-      case 'gatotkaca':
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const DetailGatotkaca(),
-          ),
-        );
-        break;
-      default:
-        // Untuk film lain, gunakan halaman detail default
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => _buildDefaultDetailPage(context, movieId),
-          ),
-        );
-        break;
-    }
-  }
+  // ✅ Single navigate function — accepts title & imagePath
+ void _navigateToMovieDetail(BuildContext context, String movieId, String title, String imagePath) {
+  // Movie data map
+  final movieData = {
+    'gatotkaca': {
+      'synopsis': 'Baru beberapa hari tinggal di apartemen...',
+      'cast': 'Rizky Nazar, Yuki Kato',
+      'duration': '119 minutes',
+      'rating': '13+',
+    },
+    'nun': {
+      'synopsis': 'A priest investigates the haunting of a Romanian monastery...',
+      'cast': 'Taissa Farmiga, Demián Bichir',
+      'duration': '96 minutes',
+      'rating': '17+',
+    },
+    'priest': {
+      'synopsis': 'A priest lives in a dystopian world ruled by the church...',
+      'cast': 'Paul Bettany, Karl Urban',
+      'duration': '87 minutes',
+      'rating': '13+',
+    },
+    // add the rest of your movies here...
+  };
 
-  // Halaman detail default untuk film yang belum memiliki halaman khusus
-  // Tambahkan parameter BuildContext
-  Widget _buildDefaultDetailPage(BuildContext context, String movieId) {
+  final data = movieData[movieId];
+
+  Navigator.push(context, MaterialPageRoute(
+    builder: (context) => DetailMovie(
+      title: title,
+      imagePath: imagePath,
+      synopsis: data?['synopsis'] ?? 'Sinopsis belum tersedia.',
+      cast: data?['cast'] ?? 'Belum tersedia.',
+      duration: data?['duration'] ?? '-',
+      rating: data?['rating'] ?? '-',
+    ),
+  ));
+}
+
+  // ✅ Single default detail page — uses title & imagePath correctly
+  Widget _buildDefaultDetailPage(
+      BuildContext context, String title, String imagePath) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back,
-            color: Colors.black,
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          'Movie Details',
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        title: Text(title,
+            style: const TextStyle(
+                color: Colors.black, fontWeight: FontWeight.bold)),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
+            Image.asset(
+              imagePath,
               height: 300,
               width: double.infinity,
-              color: Colors.grey[300],
-              child: const Center(
-                child: Icon(
-                  Icons.movie,
-                  size: 100,
-                  color: Colors.grey,
-                ),
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => Container(
+                height: 300,
+                color: Colors.grey[300],
+                child: const Icon(Icons.movie, size: 100, color: Colors.grey),
               ),
             ),
             Padding(
@@ -434,21 +371,15 @@ class HomeScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    movieId.replaceAll('_', ' ').toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
+                  Text(title,
+                      style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black)),
                   const SizedBox(height: 20),
                   const Text(
                     'Detail film akan ditampilkan di sini.',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.black87,
-                    ),
+                    style: TextStyle(fontSize: 16, color: Colors.black87),
                   ),
                 ],
               ),
