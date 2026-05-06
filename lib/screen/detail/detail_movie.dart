@@ -37,11 +37,16 @@ class DetailMovie extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Image.asset(imagePath,
-              height: 300, width: double.infinity, fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Container(
-                height: 300, color: Colors.grey[300],
-                child: const Icon(Icons.movie, size: 100, color: Colors.grey),
+            AspectRatio(
+              aspectRatio: 2 / 3,
+              child: Image.asset(
+                imagePath,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(
+                  color: Colors.grey[300],
+                  child: const Icon(Icons.movie, size: 100, color: Colors.grey),
+                ),
               ),
             ),
             Padding(
