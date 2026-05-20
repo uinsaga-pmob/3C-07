@@ -1,26 +1,105 @@
 import 'package:flutter/material.dart';
+import '../../database/database_helper.dart';
+import '../../models/movie.dart';
+import '../add_edit_movie_screen.dart';
 
 class DetailMovie extends StatelessWidget {
+  final int? movieId;
   final String title;
   final String imagePath;
   final String synopsis;
   final String cast;
   final String duration;
   final String rating;
+  final VoidCallback? onDeleted;
 
   const DetailMovie({
     super.key,
+    this.movieId,
     required this.title,
     required this.imagePath,
     required this.synopsis,
     required this.cast,
     required this.duration,
     required this.rating,
+    this.onDeleted,
   });
+
+  double _parseRatingScore(String rating) {
+    final numMatch = RegExp(r'[\d.]+').firstMatch(rating);
+    if (numMatch != null) {
+      final parsed = double.tryParse(numMatch.group(0)!);
+      if (parsed != null) {
+        if (rating.contains('+')) {
+          if (parsed >= 17) return 8.0;
+          if (parsed >= 13) return 7.5;
+          return 7.0;
+        }
+        return parsed.clamp(0, 10).toDouble();
+      }
+    }
+    return 7.0;
+  }
+
+  Future<void> _confirmDelete(BuildContext context) async {
+    if (movieId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Film ini tidak bisa dihapus (data statis)')),
+      );
+      return;
+    }
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Hapus Film'),
+        content: Text('Yakin ingin menghapus "$title"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Batal'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Hapus'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      await DatabaseHelper.instance.deleteMovie(movieId!);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('"$title" dihapus')),
+      );
+      onDeleted?.call();
+      Navigator.pop(context);
+    }
+  }
+
+  Future<void> _goToEdit(BuildContext context) async {
+    if (movieId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Film ini tidak bisa diedit (data statis)')),
+      );
+      return;
+    }
+    final movie = Movie(
+      id: movieId,
+      title: title,
+      imagePath: imagePath,
+      synopsis: synopsis,
+      cast: cast,
+      duration: duration,
+      rating: rating,
+    );
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => AddEditMovieScreen(movie: movie)),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Parse rating string to a numeric score for the circle (e.g. "13+" -> 7.5)
     final double ratingScore = _parseRatingScore(rating);
 
     return Scaffold(
@@ -45,13 +124,12 @@ class DetailMovie extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Top section: Poster (left) + Info (right) ──
+            // ── Top section ──
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Poster image
                   ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: Image.asset(
@@ -71,7 +149,6 @@ class DetailMovie extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 16),
-                  // Title + info badges
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -88,7 +165,6 @@ class DetailMovie extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 12),
-                        // Info badges row
                         Wrap(
                           spacing: 8,
                           runSpacing: 8,
@@ -99,13 +175,9 @@ class DetailMovie extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(height: 16),
-                        // Cast preview
                         Text(
                           cast,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey[600],
-                          ),
+                          style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -116,7 +188,7 @@ class DetailMovie extends StatelessWidget {
               ),
             ),
 
-            // ── Rating & Action Icons Row ──
+            // ── Rating Row ──
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Container(
@@ -127,18 +199,13 @@ class DetailMovie extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    // Rating circle
                     _buildRatingCircle(ratingScore),
                     const Spacer(),
-                    // Like / Dislike
                     Row(
                       children: [
                         const Icon(Icons.thumb_up_outlined, color: Colors.black54, size: 20),
                         const SizedBox(width: 6),
-                        Text(
-                          '250',
-                          style: TextStyle(color: Colors.grey[700], fontSize: 14),
-                        ),
+                        Text('250', style: TextStyle(color: Colors.grey[700], fontSize: 14)),
                         const SizedBox(width: 14),
                         const Icon(Icons.thumb_down_outlined, color: Colors.black54, size: 20),
                       ],
@@ -153,54 +220,33 @@ class DetailMovie extends StatelessWidget {
             // ── Synopsis ──
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    synopsis,
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: Colors.black87,
-                      height: 1.6,
-                    ),
-                    textAlign: TextAlign.justify,
-                  ),
-                ],
+              child: Text(
+                synopsis,
+                style: const TextStyle(fontSize: 15, color: Colors.black87, height: 1.6),
+                textAlign: TextAlign.justify,
               ),
             ),
 
             const SizedBox(height: 24),
 
-            // ── Cast Section ──
+            // ── Cast ──
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Cast',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
+                  const Text('Cast',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black)),
                   const SizedBox(height: 8),
-                  Text(
-                    cast,
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: Colors.black87,
-                      height: 1.5,
-                    ),
-                  ),
+                  Text(cast,
+                      style: const TextStyle(fontSize: 15, color: Colors.black87, height: 1.5)),
                 ],
               ),
             ),
 
             const SizedBox(height: 30),
 
-            // ── Buttons ──
+            // ── TRAILER & BELI TIKET ──
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
@@ -213,15 +259,11 @@ class DetailMovie extends StatelessWidget {
                         foregroundColor: const Color(0xFFC79244),
                         side: const BorderSide(color: Color(0xFFC79244), width: 2),
                         padding: const EdgeInsets.symmetric(vertical: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       ),
                       icon: const Icon(Icons.play_circle_outline),
-                      label: const Text(
-                        'TRAILER',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
+                      label: const Text('TRAILER',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                     ),
                   ),
                   const SizedBox(width: 15),
@@ -232,14 +274,50 @@ class DetailMovie extends StatelessWidget {
                         backgroundColor: const Color(0xFFC79244),
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       ),
-                      child: const Text(
-                        'BELI TIKET',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      child: const Text('BELI TIKET',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // ── EDIT & DELETE buttons ──
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () => _goToEdit(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFC79244),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       ),
+                      icon: const Icon(Icons.edit),
+                      label: const Text('EDIT',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                  const SizedBox(width: 15),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () => _confirmDelete(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                      icon: const Icon(Icons.delete),
+                      label: const Text('HAPUS',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                     ),
                   ),
                 ],
@@ -253,8 +331,6 @@ class DetailMovie extends StatelessWidget {
     );
   }
 
-  // ── Helper Widgets ──
-
   Widget _buildInfoBadge(String text) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -262,25 +338,13 @@ class DetailMovie extends StatelessWidget {
         color: Colors.grey[200],
         borderRadius: BorderRadius.circular(6),
       ),
-      child: Text(
-        text,
-        style: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.bold,
-          color: Colors.black87,
-        ),
-      ),
+      child: Text(text,
+          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black87)),
     );
   }
 
   Widget _buildInfoText(String text) {
-    return Text(
-      text,
-      style: TextStyle(
-        fontSize: 13,
-        color: Colors.grey[700],
-      ),
-    );
+    return Text(text, style: TextStyle(fontSize: 13, color: Colors.grey[700]));
   }
 
   Widget _buildRatingCircle(double score) {
@@ -296,7 +360,7 @@ class DetailMovie extends StatelessWidget {
             backgroundColor: Colors.grey[300],
             valueColor: AlwaysStoppedAnimation<Color>(
               score >= 7
-                  ? const Color(0xFFC79244) // gold for good
+                  ? const Color(0xFFC79244)
                   : score >= 5
                       ? Colors.orange
                       : Colors.red,
@@ -304,40 +368,10 @@ class DetailMovie extends StatelessWidget {
           ),
           Text(
             score.toStringAsFixed(1),
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.black),
           ),
         ],
       ),
     );
-  }
-
-  Widget _buildActionIcon(IconData icon, VoidCallback? onTap, [Color color = Colors.black54]) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Icon(icon, color: color, size: 22),
-    );
-  }
-
-  double _parseRatingScore(String rating) {
-    // Try to parse as a number directly
-    final numMatch = RegExp(r'[\d.]+').firstMatch(rating);
-    if (numMatch != null) {
-      final parsed = double.tryParse(numMatch.group(0)!);
-      if (parsed != null) {
-        // If it looks like an age rating (13+, 17+), map to a score
-        if (rating.contains('+')) {
-          if (parsed >= 17) return 8.0;
-          if (parsed >= 13) return 7.5;
-          return 7.0;
-        }
-        // Otherwise use as-is (clamped to 10)
-        return parsed.clamp(0, 10).toDouble();
-      }
-    }
-    return 7.0; // default
   }
 }

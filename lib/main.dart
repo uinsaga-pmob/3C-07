@@ -3,6 +3,7 @@ import 'screen/splashscreen.dart';
 import 'auth/login_screen.dart';
 import 'auth/register_screen.dart';
 import 'screen/main_screen.dart';
+import 'screen/movie_list_screen.dart';
 
 void main() {
   runApp(const MyApp());
