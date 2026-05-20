@@ -6,6 +6,7 @@ class Movie {
   final String cast;
   final String duration;
   final String rating;
+  final int updatedAt;
 
   Movie({
     this.id,
@@ -15,6 +16,7 @@ class Movie {
     required this.cast,
     required this.duration,
     required this.rating,
+    this.updatedAt = 0,
   });
 
   // Convert to Map for SQLite
@@ -27,6 +29,7 @@ class Movie {
       'cast': cast,
       'duration': duration,
       'rating': rating,
+      'updatedAt': updatedAt,
     };
   }
 
@@ -40,6 +43,7 @@ class Movie {
       cast: map['cast'],
       duration: map['duration'],
       rating: map['rating'],
+      updatedAt: map['updatedAt']
     );
   }
 }

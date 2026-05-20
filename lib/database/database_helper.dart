@@ -17,7 +17,12 @@ class DatabaseHelper {
   Future<Database> _initDB(String filePath) async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
-    return await openDatabase(path, version: 1, onCreate: _createDB);
+    return await openDatabase(
+      path, 
+      version: 2, 
+      onCreate: _createDB,
+      onUpgrade: _upgradeDB,
+    );
   }
 
   Future _createDB(Database db, int version) async {
@@ -29,15 +34,25 @@ class DatabaseHelper {
         synopsis TEXT NOT NULL,
         cast     TEXT NOT NULL,
         duration TEXT NOT NULL,
-        rating   TEXT NOT NULL
+        rating   TEXT NOT NULL,
+        upgradedAT INTERGER NOT NULL DEFAULT 0  
       )
     ''');
     
+  }
+  Future _upgradeDB(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute(
+        'ALTER TABLE movies ADD COLUMN updatedAt INTEGER NOT NULL DEFAULT 0'
+      );
+    }
   }
 
   // ── CREATE ──
   Future<int> insertMovie(Movie movie) async {
     final db = await database;
+    final map = movie.toMap();
+    map['updatedAt'] = DateTime.now().microsecondsSinceEpoch;
     return await db.insert('movies', movie.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace);
   }
@@ -45,7 +60,7 @@ class DatabaseHelper {
   // ── READ ALL ──
   Future<List<Movie>> getAllMovies() async {
     final db = await database;
-    final result = await db.query('movies', orderBy: 'id DESC');
+    final result = await db.query('movies', orderBy: 'updatedAt DESC');
     return result.map((map) => Movie.fromMap(map)).toList();
   }
 
@@ -60,6 +75,8 @@ class DatabaseHelper {
   // ── UPDATE ──
   Future<int> updateMovie(Movie movie) async {
     final db = await database;
+    final map = movie.toMap();
+    map['updatedAt'] = DateTime.now().millisecondsSinceEpoch;
     return await db.update('movies', movie.toMap(),
         where: 'id = ?', whereArgs: [movie.id]);
   }
