@@ -3,7 +3,7 @@ import '../../database/database_helper.dart';
 import '../../models/movie.dart';
 import '../add_edit_movie_screen.dart';
 
-class DetailMovie extends StatelessWidget {
+class DetailMovie extends StatefulWidget {
   final int? movieId;
   final String title;
   final String imagePath;
@@ -27,6 +27,45 @@ class DetailMovie extends StatelessWidget {
     this.onEdited,
   });
 
+  @override
+  State<DetailMovie> createState() => _DetailMovieState();
+}
+
+class _DetailMovieState extends State<DetailMovie> {
+  late String _title;
+  late String _imagePath;
+  late String _synopsis;
+  late String _cast;
+  late String _duration;
+  late String _rating;
+
+  @override
+  void initState() {
+    super.initState();
+    _title     = widget.title;
+    _imagePath = widget.imagePath;
+    _synopsis  = widget.synopsis;
+    _cast      = widget.cast;
+    _duration  = widget.duration;
+    _rating    = widget.rating;
+  }
+
+  // Reload latest data from DB after edit
+  Future<void> _reloadFromDB() async {
+    if (widget.movieId == null) return;
+    final movie = await DatabaseHelper.instance.getMovie(widget.movieId!);
+    if (movie != null && mounted) {
+      setState(() {
+        _title     = movie.title;
+        _imagePath = movie.imagePath;
+        _synopsis  = movie.synopsis;
+        _cast      = movie.cast;
+        _duration  = movie.duration;
+        _rating    = movie.rating;
+      });
+    }
+  }
+
   double _parseRatingScore(String rating) {
     final numMatch = RegExp(r'[\d.]+').firstMatch(rating);
     if (numMatch != null) {
@@ -43,8 +82,8 @@ class DetailMovie extends StatelessWidget {
     return 7.0;
   }
 
-  Future<void> _confirmDelete(BuildContext context) async {
-    if (movieId == null) {
+  Future<void> _confirmDelete() async {
+    if (widget.movieId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Film ini tidak bisa dihapus (data statis)')),
       );
@@ -54,7 +93,7 @@ class DetailMovie extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Hapus Film'),
-        content: Text('Yakin ingin menghapus "$title"?'),
+        content: Text('Yakin ingin menghapus "$_title"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
@@ -69,41 +108,44 @@ class DetailMovie extends StatelessWidget {
       ),
     );
     if (confirmed == true) {
-      await DatabaseHelper.instance.deleteMovie(movieId!);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('"$title" dihapus')),
-      );
-      onDeleted?.call();
-      Navigator.pop(context);
+      await DatabaseHelper.instance.deleteMovie(widget.movieId!);
+      widget.onDeleted?.call();
+      if (mounted) Navigator.pop(context);
     }
   }
 
-  Future<void> _goToEdit(BuildContext context) async {
-    if (movieId == null) {
+  Future<void> _goToEdit() async {
+    if (widget.movieId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Film ini tidak bisa diedit (data statis)')),
       );
       return;
     }
-    final movie = Movie(
-      id: movieId,
-      title: title,
-      imagePath: imagePath,
-      synopsis: synopsis,
-      cast: cast,
-      duration: duration,
-      rating: rating,
-    );
     await Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => AddEditMovieScreen(movie: movie)),
+      MaterialPageRoute(
+        builder: (_) => AddEditMovieScreen(
+          movie: Movie(
+            id: widget.movieId,
+            title: _title,
+            imagePath: _imagePath,
+            synopsis: _synopsis,
+            cast: _cast,
+            duration: _duration,
+            rating: _rating,
+          ),
+        ),
+      ),
     );
-    onEdited?.call();
+    // Reload detail screen with new data
+    await _reloadFromDB();
+    // Tell home screen to refresh too
+    widget.onEdited?.call();
   }
 
   @override
   Widget build(BuildContext context) {
-    final double ratingScore = _parseRatingScore(rating);
+    final double ratingScore = _parseRatingScore(_rating);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -115,11 +157,8 @@ class DetailMovie extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          title,
-          style: const TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
+          _title,
+          style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
       ),
@@ -127,7 +166,6 @@ class DetailMovie extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Top section ──
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
               child: Row(
@@ -136,13 +174,10 @@ class DetailMovie extends StatelessWidget {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: Image.asset(
-                      imagePath,
-                      width: 130,
-                      height: 190,
-                      fit: BoxFit.cover,
+                      _imagePath,
+                      width: 130, height: 190, fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) => Container(
-                        width: 130,
-                        height: 190,
+                        width: 130, height: 190,
                         decoration: BoxDecoration(
                           color: Colors.grey[800],
                           borderRadius: BorderRadius.circular(12),
@@ -157,33 +192,22 @@ class DetailMovie extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 8),
-                        Text(
-                          title,
-                          style: const TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                        Text(_title,
+                            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black),
+                            maxLines: 2, overflow: TextOverflow.ellipsis),
                         const SizedBox(height: 12),
                         Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
+                          spacing: 8, runSpacing: 8,
                           children: [
                             _buildInfoBadge('HD'),
-                            _buildInfoText(duration),
-                            _buildInfoText(rating),
+                            _buildInfoText(_duration),
+                            _buildInfoText(_rating),
                           ],
                         ),
                         const SizedBox(height: 16),
-                        Text(
-                          cast,
-                          style: TextStyle(fontSize: 13, color: Colors.grey[600]),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                        Text(_cast,
+                            style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                            maxLines: 2, overflow: TextOverflow.ellipsis),
                       ],
                     ),
                   ),
@@ -191,7 +215,6 @@ class DetailMovie extends StatelessWidget {
               ),
             ),
 
-            // ── Rating Row ──
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Container(
@@ -220,36 +243,29 @@ class DetailMovie extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            // ── Synopsis ──
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Text(
-                synopsis,
-                style: const TextStyle(fontSize: 15, color: Colors.black87, height: 1.6),
-                textAlign: TextAlign.justify,
-              ),
+              child: Text(_synopsis,
+                  style: const TextStyle(fontSize: 15, color: Colors.black87, height: 1.6),
+                  textAlign: TextAlign.justify),
             ),
 
             const SizedBox(height: 24),
 
-            // ── Cast ──
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Cast',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black)),
+                  const Text('Cast', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
-                  Text(cast,
-                      style: const TextStyle(fontSize: 15, color: Colors.black87, height: 1.5)),
+                  Text(_cast, style: const TextStyle(fontSize: 15, color: Colors.black87, height: 1.5)),
                 ],
               ),
             ),
 
             const SizedBox(height: 30),
 
-            // ── TRAILER & BELI TIKET ──
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
@@ -265,8 +281,7 @@ class DetailMovie extends StatelessWidget {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       ),
                       icon: const Icon(Icons.play_circle_outline),
-                      label: const Text('TRAILER',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      label: const Text('TRAILER', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                     ),
                   ),
                   const SizedBox(width: 15),
@@ -279,8 +294,7 @@ class DetailMovie extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(vertical: 15),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       ),
-                      child: const Text('BELI TIKET',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      child: const Text('BELI TIKET', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                     ),
                   ),
                 ],
@@ -289,14 +303,13 @@ class DetailMovie extends StatelessWidget {
 
             const SizedBox(height: 16),
 
-            // ── EDIT & DELETE buttons ──
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
                 children: [
                   Expanded(
                     child: ElevatedButton.icon(
-                      onPressed: () => _goToEdit(context),
+                      onPressed: _goToEdit,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFC79244),
                         foregroundColor: Colors.white,
@@ -304,14 +317,13 @@ class DetailMovie extends StatelessWidget {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       ),
                       icon: const Icon(Icons.edit),
-                      label: const Text('EDIT',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      label: const Text('EDIT', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                     ),
                   ),
                   const SizedBox(width: 15),
                   Expanded(
                     child: ElevatedButton.icon(
-                      onPressed: () => _confirmDelete(context),
+                      onPressed: _confirmDelete,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
                         foregroundColor: Colors.white,
@@ -319,8 +331,7 @@ class DetailMovie extends StatelessWidget {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       ),
                       icon: const Icon(Icons.delete),
-                      label: const Text('HAPUS',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      label: const Text('HAPUS', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                     ),
                   ),
                 ],
@@ -334,45 +345,30 @@ class DetailMovie extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoBadge(String text) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Text(text,
-          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black87)),
-    );
-  }
+  Widget _buildInfoBadge(String text) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+    decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(6)),
+    child: Text(text, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black87)),
+  );
 
-  Widget _buildInfoText(String text) {
-    return Text(text, style: TextStyle(fontSize: 13, color: Colors.grey[700]));
-  }
+  Widget _buildInfoText(String text) =>
+      Text(text, style: TextStyle(fontSize: 13, color: Colors.grey[700]));
 
   Widget _buildRatingCircle(double score) {
     return SizedBox(
-      width: 44,
-      height: 44,
+      width: 44, height: 44,
       child: Stack(
         alignment: Alignment.center,
         children: [
           CircularProgressIndicator(
-            value: score / 10,
-            strokeWidth: 3,
+            value: score / 10, strokeWidth: 3,
             backgroundColor: Colors.grey[300],
             valueColor: AlwaysStoppedAnimation<Color>(
-              score >= 7
-                  ? const Color(0xFFC79244)
-                  : score >= 5
-                      ? Colors.orange
-                      : Colors.red,
+              score >= 7 ? const Color(0xFFC79244) : score >= 5 ? Colors.orange : Colors.red,
             ),
           ),
-          Text(
-            score.toStringAsFixed(1),
-            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.black),
-          ),
+          Text(score.toStringAsFixed(1),
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.black)),
         ],
       ),
     );
