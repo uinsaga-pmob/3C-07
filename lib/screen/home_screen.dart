@@ -86,6 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
           duration: movie.duration,
           rating: movie.rating,
           onDeleted: _refresh,
+          onEdited: _refresh,
         ),
       ),
     );

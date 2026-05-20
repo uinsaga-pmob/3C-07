@@ -12,6 +12,7 @@ class DetailMovie extends StatelessWidget {
   final String duration;
   final String rating;
   final VoidCallback? onDeleted;
+  final VoidCallback? onEdited;
 
   const DetailMovie({
     super.key,
@@ -23,6 +24,7 @@ class DetailMovie extends StatelessWidget {
     required this.duration,
     required this.rating,
     this.onDeleted,
+    this.onEdited,
   });
 
   double _parseRatingScore(String rating) {
@@ -96,6 +98,7 @@ class DetailMovie extends StatelessWidget {
       context,
       MaterialPageRoute(builder: (_) => AddEditMovieScreen(movie: movie)),
     );
+    onEdited?.call();
   }
 
   @override
