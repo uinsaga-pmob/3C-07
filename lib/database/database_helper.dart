@@ -35,7 +35,11 @@ class DatabaseHelper {
         cast     TEXT NOT NULL,
         duration TEXT NOT NULL,
         rating   TEXT NOT NULL,
+<<<<<<< HEAD
      updatedAt TEXT 
+=======
+        updatedAt INTERGER NOT NULL DEFAULT 0  
+>>>>>>> 44be080a44457bfb7ea9fdaf020f3a1dd0c39c1e
       )
     ''');
     
