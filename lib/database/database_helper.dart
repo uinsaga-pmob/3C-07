@@ -35,7 +35,7 @@ class DatabaseHelper {
         cast     TEXT NOT NULL,
         duration TEXT NOT NULL,
         rating   TEXT NOT NULL,
-        upgradedAT INTERGER NOT NULL DEFAULT 0  
+        updatedAt INTERGER NOT NULL DEFAULT 0  
       )
     ''');
     
