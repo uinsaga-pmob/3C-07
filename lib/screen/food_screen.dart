@@ -223,7 +223,7 @@ class _FoodScreenState extends State<FoodScreen> {
                   crossAxisCount: 2,
                   crossAxisSpacing: 16,
                   mainAxisSpacing: 16,
-                  childAspectRatio: 0.75,
+                  childAspectRatio: 0.6, // <--- DIUBAH DARI 0.75 BIAR KARTUNYA LEBIH MANJANG KE BAWAH
                 ),
                 itemCount: currentItems.length,
                 itemBuilder: (context, index) {
@@ -373,85 +373,92 @@ class _FoodScreenState extends State<FoodScreen> {
             ),
           ),
           
-          // Food Details
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  name,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  description,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  price,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                
-                // Quantity Control
-                quantity > 0
-                    ? Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          IconButton(
-                            onPressed: onRemove,
-                            icon: const Icon(Icons.remove),
-                            style: IconButton.styleFrom(
-                              backgroundColor: Colors.grey[200],
-                              padding: const EdgeInsets.all(4),
-                            ),
-                          ),
-                          Text(
-                            quantity.toString(),
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: onAdd,
-                            icon: const Icon(Icons.add),
-                            style: IconButton.styleFrom(
-                              backgroundColor: Colors.grey[200],
-                              padding: const EdgeInsets.all(4),
-                            ),
-                          ),
-                        ],
-                      )
-                    : SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: onAdd,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                          ),
-                          child: const Text('Tambah'),
+          // Food Details - Ditambahin Expanded biar konten rapi ngisi sisa kartu
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween, // <--- BIAR TOMBOL KE-PUSH KE BAWAH
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        description,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[600],
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        price,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green,
                         ),
                       ),
-              ],
+                    ],
+                  ),
+                  
+                  // Quantity Control
+                  quantity > 0
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            IconButton(
+                              onPressed: onRemove,
+                              icon: const Icon(Icons.remove),
+                              style: IconButton.styleFrom(
+                                backgroundColor: Colors.grey[200],
+                                padding: const EdgeInsets.all(4),
+                              ),
+                            ),
+                            Text(
+                              quantity.toString(),
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: onAdd,
+                              icon: const Icon(Icons.add),
+                              style: IconButton.styleFrom(
+                                backgroundColor: Colors.grey[200],
+                                padding: const EdgeInsets.all(4),
+                              ),
+                            ),
+                          ],
+                        )
+                      : SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: onAdd,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.black,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                            ),
+                            child: const Text('Tambah'),
+                          ),
+                        ),
+                ],
+              ),
             ),
           ),
         ],
@@ -479,7 +486,8 @@ class _FoodScreenState extends State<FoodScreen> {
       }
     }
     
-    return 'Rp.${total.toStringAsFixed(3).replaceAll('.', ',')}';
+    // Dibenarkan format totalnya biar sesuai pembacaan ribuan (biar gak ada koma nyasar)
+    return 'Rp.${total.toStringAsFixed(0)}'; 
   }
 
   void _showOrderConfirmation(BuildContext context) {

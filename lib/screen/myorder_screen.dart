@@ -1,3 +1,4 @@
+import 'dart:ui'; // Wajib buat efek blur kaca
 import 'main_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -14,6 +15,8 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // BACKGROUND UTAMA APLIKASI: Pakai putih bersih biar efek kacanya kelihatan clean
+      backgroundColor: Colors.white, 
       appBar: AppBar(
         title: const Text(
           'CINETIX',
@@ -21,6 +24,7 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
             fontSize: 24,
             fontWeight: FontWeight.bold,
             color: Colors.white,
+            letterSpacing: 1.2,
           ),
         ),
         backgroundColor: Colors.black,
@@ -48,7 +52,7 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
           // Kategori Selection
           Container(
             height: 60,
-            color: Colors.grey[100],
+            color: Colors.white,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -60,19 +64,12 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
                     });
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 32,
-                      vertical: 12,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                     decoration: BoxDecoration(
-                      color: _selectedCategory == 0
-                          ? Colors.black
-                          : Colors.transparent,
+                      color: _selectedCategory == 0 ? Colors.black : Colors.transparent,
                       borderRadius: BorderRadius.circular(25),
                       border: Border.all(
-                        color: _selectedCategory == 0
-                            ? Colors.black
-                            : Colors.grey[300]!,
+                        color: _selectedCategory == 0 ? Colors.black : Colors.grey[300]!,
                         width: 1,
                       ),
                     ),
@@ -80,9 +77,7 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
                       children: [
                         Icon(
                           Icons.movie,
-                          color: _selectedCategory == 0
-                              ? Colors.white
-                              : Colors.black,
+                          color: _selectedCategory == 0 ? Colors.white : Colors.black,
                           size: 20,
                         ),
                         const SizedBox(width: 8),
@@ -91,9 +86,7 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
-                            color: _selectedCategory == 0
-                                ? Colors.white
-                                : Colors.black,
+                            color: _selectedCategory == 0 ? Colors.white : Colors.black,
                           ),
                         ),
                       ],
@@ -109,19 +102,12 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
                     });
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 32,
-                      vertical: 12,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                     decoration: BoxDecoration(
-                      color: _selectedCategory == 1
-                          ? Colors.black
-                          : Colors.transparent,
+                      color: _selectedCategory == 1 ? Colors.black : Colors.transparent,
                       borderRadius: BorderRadius.circular(25),
                       border: Border.all(
-                        color: _selectedCategory == 1
-                            ? Colors.black
-                            : Colors.grey[300]!,
+                        color: _selectedCategory == 1 ? Colors.black : Colors.grey[300]!,
                         width: 1,
                       ),
                     ),
@@ -129,9 +115,7 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
                       children: [
                         Icon(
                           Icons.fastfood,
-                          color: _selectedCategory == 1
-                              ? Colors.white
-                              : Colors.black,
+                          color: _selectedCategory == 1 ? Colors.white : Colors.black,
                           size: 20,
                         ),
                         const SizedBox(width: 8),
@@ -140,9 +124,7 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
-                            color: _selectedCategory == 1
-                                ? Colors.white
-                                : Colors.black,
+                            color: _selectedCategory == 1 ? Colors.white : Colors.black,
                           ),
                         ),
                       ],
@@ -153,13 +135,16 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
             ),
           ),
           
-          // Content based on selected category
+          // Content Area dengan Scroll Biar Aman dari Kuning-Kuning
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(20.0),
-              child: _selectedCategory == 0
-                  ? _buildFilmContent()
-                  : _buildFoodContent(),
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: _selectedCategory == 0
+                    ? _buildFilmContent()
+                    : _buildFoodContent(),
+              ),
             ),
           ),
         ],
@@ -167,242 +152,164 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
     );
   }
   
+  // ── 1. KONTEN FILM MURNI CLEAN & GLASS (BENING) ──
   Widget _buildFilmContent() {
     return Center(
-      child: Card(
-        elevation: 5,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05), // Bayangan super tipis biar clean
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            )
+          ],
         ),
-        child: Container(
-          width: double.infinity,
-          height: 350,
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: Colors.black,
-            borderRadius: BorderRadius.circular(20),
-            image: const DecorationImage(
-              image: AssetImage('assets/film2/Adot.jpg'),
-              fit: BoxFit.cover,
-              colorFilter: ColorFilter.mode(
-                Colors.black54,
-                BlendMode.darken,
-              ),
-            ),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Logo/Icon
-              Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(50),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0), // Efek buram kencang ala kaca frosted
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 35),
+              decoration: BoxDecoration(
+                // KUNCI GLASS BENING: Pakai warna hitam transparan tipis banget (0.05) biar nembus warna putih di belakangnya
+                color: Colors.black.withOpacity(0.05), 
+                border: Border.all(
+                  color: Colors.black.withOpacity(0.15), // Tepian kaca halus
+                  width: 1.5,
                 ),
-                child: const Icon(
-                  Icons.movie,
-                  size: 60,
-                  color: Colors.white,
-                ),
+                borderRadius: BorderRadius.circular(24),
               ),
-              
-              const SizedBox(height: 30),
-              
-              // Main Text
-              const Text(
-                'Hari ini kita nonton, yuk!',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              
-              const SizedBox(height: 16),
-              
-              // Sub Text
-              const Text(
-                'Luangkan waktumu untuk menonton film',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.white70,
-                  height: 1.5,
-                ),
-              ),
-              
-              const SizedBox(height: 30),
-              
-              // Button
-              SizedBox(
-                width: 250,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Navigate to home screen (dashboard/daftar film)
-                    _navigateToHome(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
-                    ),
-                    elevation: 5,
-                  ),
-                  child: const Text(
-                    'Lihat yang lagi tayang',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-              
-              const SizedBox(height: 20),
-              
-              // Time display (optional - sesuai gambar)
-              Row(
+              child: Column(
+                mainAxisSize: MainAxisSize.min, // Bebas kuning overflow
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _buildTimeBadge('11:53'),
-                  const SizedBox(width: 20),
-                  _buildTimeBadge('8:45'),
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.08),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.movie_creation_outlined, size: 40, color: Colors.black87),
+                  ),
+                  const SizedBox(height: 24),
+                  const Text(
+                    'Belum ada tiket film',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black87),
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Yuk, cari dan pesan tiket film favoritmu sekarang!',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 14, color: Colors.black54),
+                  ),
+                  const SizedBox(height: 32),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: () => _navigateToHome(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black, // Tombol dibikin hitam solid biar kontras dan tegas
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      ),
+                      child: const Text('Cari Film', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    ),
+                  ),
                 ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-  
-  Widget _buildFoodContent() {
-    return Center(
-      child: Card(
-        elevation: 5,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Container(
-          width: double.infinity,
-          height: 350,
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: Colors.orange[800],
-            borderRadius: BorderRadius.circular(20),
-            image: const DecorationImage(
-              image: AssetImage('assets/food_bg.jpg'),
-              fit: BoxFit.cover,
-              colorFilter: ColorFilter.mode(
-                Colors.black54,
-                BlendMode.darken,
               ),
             ),
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Logo/Icon
-              Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(50),
-                ),
-                child: const Icon(
-                  Icons.fastfood,
-                  size: 60,
-                  color: Colors.white,
-                ),
-              ),
-              
-              const SizedBox(height: 30),
-              
-              // Main Text
-              const Text(
-                'Hari ini kita nyemil, yuk!',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              
-              const SizedBox(height: 16),
-              
-              // Sub Text
-              const Text(
-                'Cemilan popcorn atau makanan & minuman enak lainnya',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.white70,
-                  height: 1.5,
-                ),
-              ),
-              
-              const SizedBox(height: 30),
-              
-              // Button
-              SizedBox(
-                width: 200,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Navigate to food screen
-                    _navigateToFood(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.orange[800],
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
-                    ),
-                    elevation: 5,
-                  ),
-                  child: const Text(
-                    'Beli cemilan',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );
   }
   
-  Widget _buildTimeBadge(String time) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        time,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
+  // ── 2. KONTEN FOOD MURNI CLEAN & GLASS (BENING) ──
+  Widget _buildFoodContent() {
+    return Center(
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            )
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 35),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.05), // Kaca bening
+                border: Border.all(
+                  color: Colors.black.withOpacity(0.15),
+                  width: 1.5,
+                ),
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.08),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.fastfood_outlined, size: 40, color: Colors.black87),
+                  ),
+                  const SizedBox(height: 24),
+                  const Text(
+                    'Belum ada pesanan',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black87),
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Beli camilan popcorn biar nonton kamu lebih seru!',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 14, color: Colors.black54),
+                  ),
+                  const SizedBox(height: 32),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: () => _navigateToFood(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      ),
+                      child: const Text('Beli Cemilan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );
   }
   
   void _navigateToHome(BuildContext context) {
-    // Navigate using route replacement
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
@@ -412,7 +319,6 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
   }
   
   void _navigateToFood(BuildContext context) {
-    // Navigate using route replacement
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
