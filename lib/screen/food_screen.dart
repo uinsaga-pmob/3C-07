@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import '../database/database_helper.dart';
 
 class FoodScreen extends StatefulWidget {
   const FoodScreen({super.key});
@@ -526,22 +528,52 @@ class _FoodScreenState extends State<FoodScreen> {
     );
   }
 
-  void _processOrder(BuildContext context) {
+  void _processOrder(BuildContext context) async {
+    // Build items list to store in JSON
+    final List<Map<String, dynamic>> itemsList = [];
+    for (var category in foodItems.keys) {
+      for (var item in foodItems[category]!) {
+        final String itemKey = '${category}_${item['name']}';
+        if (cart.containsKey(itemKey)) {
+          itemsList.add({
+            'name': item['name'],
+            'price': item['price'],
+            'quantity': cart[itemKey],
+            'category': category,
+          });
+        }
+      }
+    }
+
+    final totalItems = _calculateTotalItems();
+    final totalPriceStr = _calculateTotalPrice();
+
+    final order = {
+      'itemsJson': json.encode(itemsList),
+      'totalItems': totalItems,
+      'totalPrice': totalPriceStr,
+    };
+
+    // Save to Database
+    await DatabaseHelper.instance.insertFoodOrder(order);
+
     // Clear cart
     cart.clear();
     
     // Show success message
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Pesanan berhasil diproses!'),
-        backgroundColor: Colors.green,
-      ),
-    );
-    
-    // Close dialog
-    Navigator.pop(context);
-    
-    // Update UI
-    setState(() {});
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Pesanan berhasil diproses!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+      
+      // Close dialog
+      Navigator.pop(context);
+      
+      // Update UI
+      setState(() {});
+    }
   }
 }

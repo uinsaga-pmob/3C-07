@@ -19,7 +19,7 @@ class DatabaseHelper {
     final path = join(dbPath, filePath);
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
     );
@@ -38,6 +38,29 @@ class DatabaseHelper {
         updatedAt INTEGER NOT NULL DEFAULT 0
       )
     ''');
+    await db.execute('''
+      CREATE TABLE bookings (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        movieId INTEGER NOT NULL,
+        movieTitle TEXT NOT NULL,
+        movieImagePath TEXT NOT NULL,
+        bookingDate TEXT NOT NULL,
+        bookingTime TEXT NOT NULL,
+        seats TEXT NOT NULL,
+        quantity INTEGER NOT NULL,
+        totalPrice INTEGER NOT NULL,
+        createdAt INTEGER NOT NULL
+      )
+    ''');
+    await db.execute('''
+      CREATE TABLE food_orders (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        itemsJson TEXT NOT NULL,
+        totalItems INTEGER NOT NULL,
+        totalPrice TEXT NOT NULL,
+        createdAt INTEGER NOT NULL
+      )
+    ''');
   }
 
   Future _upgradeDB(Database db, int oldVersion, int newVersion) async {
@@ -45,6 +68,31 @@ class DatabaseHelper {
       await db.execute(
         'ALTER TABLE movies ADD COLUMN updatedAt INTEGER NOT NULL DEFAULT 0',
       );
+    }
+    if (oldVersion < 3) {
+      await db.execute('''
+        CREATE TABLE bookings (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          movieId INTEGER NOT NULL,
+          movieTitle TEXT NOT NULL,
+          movieImagePath TEXT NOT NULL,
+          bookingDate TEXT NOT NULL,
+          bookingTime TEXT NOT NULL,
+          seats TEXT NOT NULL,
+          quantity INTEGER NOT NULL,
+          totalPrice INTEGER NOT NULL,
+          createdAt INTEGER NOT NULL
+        )
+      ''');
+      await db.execute('''
+        CREATE TABLE food_orders (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          itemsJson TEXT NOT NULL,
+          totalItems INTEGER NOT NULL,
+          totalPrice TEXT NOT NULL,
+          createdAt INTEGER NOT NULL
+        )
+      ''');
     }
   }
 
@@ -92,6 +140,30 @@ class DatabaseHelper {
   Future<int> deleteMovie(int id) async {
     final db = await database;
     return await db.delete('movies', where: 'id = ?', whereArgs: [id]);
+  }
+
+  // ── BOOKING OPERATIONS ──
+  Future<int> insertBooking(Map<String, dynamic> booking) async {
+    final db = await database;
+    booking['createdAt'] = DateTime.now().millisecondsSinceEpoch;
+    return await db.insert('bookings', booking);
+  }
+
+  Future<List<Map<String, dynamic>>> getAllBookings() async {
+    final db = await database;
+    return await db.query('bookings', orderBy: 'createdAt DESC');
+  }
+
+  // ── FOOD ORDER OPERATIONS ──
+  Future<int> insertFoodOrder(Map<String, dynamic> order) async {
+    final db = await database;
+    order['createdAt'] = DateTime.now().millisecondsSinceEpoch;
+    return await db.insert('food_orders', order);
+  }
+
+  Future<List<Map<String, dynamic>>> getAllFoodOrders() async {
+    final db = await database;
+    return await db.query('food_orders', orderBy: 'createdAt DESC');
   }
 
   // ── SEED DATA ──

@@ -45,33 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
         .toList();
   }
 
-  Future<void> _confirmDelete(Movie movie) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Hapus Film'),
-        content: Text('Yakin ingin menghapus "${movie.title}"?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Batal'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Hapus'),
-          ),
-        ],
-      ),
-    );
-    if (confirmed == true) {
-      await DatabaseHelper.instance.deleteMovie(movie.id!);
-      _refresh();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('"${movie.title}" dihapus')),
-      );
-    }
-  }
+
 
   void _goToDetail(Movie movie) {
     Navigator.push(
@@ -92,13 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Future<void> _goToEdit(Movie movie) async {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => AddEditMovieScreen(movie: movie)),
-    );
-    _refresh();
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -132,17 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () async {
-          await Navigator.push(context,
-              MaterialPageRoute(builder: (_) => const AddEditMovieScreen()));
-          _refresh();
-        },
-        backgroundColor: const Color(0xFFC79244),
-        icon: const Icon(Icons.add, color: Colors.white),
-        label: const Text('Tambah Film',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-      ),
+
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
