@@ -187,7 +187,6 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
     final dateStr = booking['bookingDate'] as String;
     final timeStr = booking['bookingTime'] as String;
     final seatsStr = booking['seats'] as String;
-    final quantity = booking['quantity'] as int;
     final totalPrice = booking['totalPrice'] as int;
     final id = booking['id'] as int;
 

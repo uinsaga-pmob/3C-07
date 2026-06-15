@@ -5,6 +5,7 @@ import '../models/movie.dart';
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
   static Database? _database;
+  bool isAdmin = false;
 
   DatabaseHelper._init();
 

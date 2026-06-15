@@ -100,7 +100,21 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-
+      floatingActionButton: DatabaseHelper.instance.isAdmin
+          ? FloatingActionButton.extended(
+              onPressed: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AddEditMovieScreen()),
+                );
+                _refresh();
+              },
+              backgroundColor: const Color(0xFFC79244),
+              icon: const Icon(Icons.add, color: Colors.white),
+              label: const Text('Tambah Film',
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            )
+          : null,
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

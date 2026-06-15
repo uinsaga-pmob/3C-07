@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import '../database/database_helper.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  final VoidCallback? onModeChanged;
+
+  const ProfileScreen({super.key, this.onModeChanged});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -288,6 +291,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     icon: Icons.switch_account_outlined,
                     title: 'Ganti Akun',
                     onTap: _changeAccount,
+                  ),
+                  _buildMenuTile(
+                    icon: DatabaseHelper.instance.isAdmin ? Icons.person_outline : Icons.admin_panel_settings_outlined,
+                    title: DatabaseHelper.instance.isAdmin ? 'Ubah ke Mode User' : 'Ubah ke Mode Admin',
+                    onTap: () {
+                      setState(() {
+                        DatabaseHelper.instance.isAdmin = !DatabaseHelper.instance.isAdmin;
+                      });
+                      widget.onModeChanged?.call();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(DatabaseHelper.instance.isAdmin 
+                              ? 'Beralih ke Mode Admin' 
+                              : 'Beralih ke Mode User'),
+                          backgroundColor: Colors.indigo,
+                        ),
+                      );
+                    },
                   ),
                   _buildMenuTile(
                     icon: Icons.logout_rounded,

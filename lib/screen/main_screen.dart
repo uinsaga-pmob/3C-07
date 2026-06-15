@@ -14,12 +14,23 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  late final List<Widget> _pages;
   late int _selectedIndex;
   
   @override
   void initState() {
     super.initState();
     _selectedIndex = widget.initialIndex;
+    _pages = [
+      const HomeScreen(),
+      const MyOrderScreen(),
+      const FoodScreen(),
+      ProfileScreen(
+        onModeChanged: () {
+          setState(() {});
+        },
+      ),
+    ];
   }
 
   void _onItemTapped(int index) {
@@ -27,14 +38,6 @@ class _MainScreenState extends State<MainScreen> {
       _selectedIndex = index;
     });
   }
-
-  // Daftar halaman yang akan ditampilkan
-  final List<Widget> _pages = [
-    const HomeScreen(),
-    const MyOrderScreen(),
-    const FoodScreen(),
-    const ProfileScreen(),
-  ];
 
   @override
   Widget build(BuildContext context) {

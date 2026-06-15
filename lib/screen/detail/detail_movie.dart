@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../database/database_helper.dart';
 import '../../models/movie.dart';
 import '../seat_booking_screen.dart';
+import '../add_edit_movie_screen.dart';
 
 class DetailMovie extends StatefulWidget {
   final int? movieId;
@@ -69,6 +70,80 @@ class _DetailMovieState extends State<DetailMovie> {
   }
 
 
+
+  Future<void> _reloadFromDB() async {
+    if (widget.movieId == null) return;
+    final movie = await DatabaseHelper.instance.getMovie(widget.movieId!);
+    if (movie != null && mounted) {
+      setState(() {
+        _title     = movie.title;
+        _imagePath = movie.imagePath;
+        _synopsis  = movie.synopsis;
+        _cast      = movie.cast;
+        _duration  = movie.duration;
+        _rating    = movie.rating;
+      });
+    }
+  }
+
+  Future<void> _confirmDelete() async {
+    if (widget.movieId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Film ini tidak bisa dihapus (data statis)')),
+      );
+      return;
+    }
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Hapus Film'),
+        content: Text('Yakin ingin menghapus "$_title"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Batal'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Hapus'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      await DatabaseHelper.instance.deleteMovie(widget.movieId!);
+      widget.onDeleted?.call();
+      if (mounted) Navigator.pop(context);
+    }
+  }
+
+  Future<void> _goToEdit() async {
+    if (widget.movieId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Film ini tidak bisa diedit (data statis)')),
+      );
+      return;
+    }
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => AddEditMovieScreen(
+          movie: Movie(
+            id: widget.movieId,
+            title: _title,
+            imagePath: _imagePath,
+            synopsis: _synopsis,
+            cast: _cast,
+            duration: _duration,
+            rating: _rating,
+          ),
+        ),
+      ),
+    );
+    await _reloadFromDB();
+    widget.onEdited?.call();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -247,6 +322,43 @@ class _DetailMovieState extends State<DetailMovie> {
 
 
 
+            if (DatabaseHelper.instance.isAdmin) ...[
+              const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: _goToEdit,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFC79244),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                        icon: const Icon(Icons.edit),
+                        label: const Text('EDIT', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                    const SizedBox(width: 15),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: _confirmDelete,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                        icon: const Icon(Icons.delete),
+                        label: const Text('HAPUS', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
             const SizedBox(height: 30),
           ],
         ),
