@@ -18,8 +18,8 @@ class DatabaseHelper {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
     return await openDatabase(
-      path, 
-      version: 2, 
+      path,
+      version: 2,
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
     );
@@ -28,26 +28,22 @@ class DatabaseHelper {
   Future _createDB(Database db, int version) async {
     await db.execute('''
       CREATE TABLE movies (
-        id       INTEGER PRIMARY KEY AUTOINCREMENT,
-        title    TEXT NOT NULL,
+        id        INTEGER PRIMARY KEY AUTOINCREMENT,
+        title     TEXT NOT NULL,
         imagePath TEXT NOT NULL,
-        synopsis TEXT NOT NULL,
-        cast     TEXT NOT NULL,
-        duration TEXT NOT NULL,
-        rating   TEXT NOT NULL,
-<<<<<<< HEAD
-     updatedAt TEXT 
-=======
-        updatedAt INTERGER NOT NULL DEFAULT 0  
->>>>>>> 44be080a44457bfb7ea9fdaf020f3a1dd0c39c1e
+        synopsis  TEXT NOT NULL,
+        cast      TEXT NOT NULL,
+        duration  TEXT NOT NULL,
+        rating    TEXT NOT NULL,
+        updatedAt INTEGER NOT NULL DEFAULT 0
       )
     ''');
-    
   }
+
   Future _upgradeDB(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
       await db.execute(
-        'ALTER TABLE movies ADD COLUMN updatedAt INTEGER NOT NULL DEFAULT 0'
+        'ALTER TABLE movies ADD COLUMN updatedAt INTEGER NOT NULL DEFAULT 0',
       );
     }
   }
@@ -56,9 +52,12 @@ class DatabaseHelper {
   Future<int> insertMovie(Movie movie) async {
     final db = await database;
     final map = movie.toMap();
-    map['updatedAt'] = DateTime.now().microsecondsSinceEpoch;
-    return await db.insert('movies', movie.toMap(),
-        conflictAlgorithm: ConflictAlgorithm.replace);
+    map['updatedAt'] = DateTime.now().millisecondsSinceEpoch;
+    return await db.insert(
+      'movies',
+      map,
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 
   // ── READ ALL ──
@@ -81,8 +80,12 @@ class DatabaseHelper {
     final db = await database;
     final map = movie.toMap();
     map['updatedAt'] = DateTime.now().millisecondsSinceEpoch;
-    return await db.update('movies', movie.toMap(),
-        where: 'id = ?', whereArgs: [movie.id]);
+    return await db.update(
+      'movies',
+      map,
+      where: 'id = ?',
+      whereArgs: [movie.id],
+    );
   }
 
   // ── DELETE ──
@@ -91,48 +94,94 @@ class DatabaseHelper {
     return await db.delete('movies', where: 'id = ?', whereArgs: [id]);
   }
 
+  // ── SEED DATA ──
   Future<void> seedMoviesIfEmpty() async {
-  final db = await database;
-  final existing = await db.query('movies');
-  if (existing.isNotEmpty) return; // already seeded
+    final db = await database;
+    final existing = await db.query('movies');
+    if (existing.isNotEmpty) return; // already seeded
 
-  final hardcodedMovies = [
-    Movie(title: 'Gatotkaca', imagePath: 'assets/film/Gatotkaca.jpg',
-        synopsis: 'Baru beberapa hari tinggal di apartemen...',
-        cast: 'Rizky Nazar, Yuki Kato', duration: '119 minutes', rating: '13+'),
-    Movie(title: 'Priest', imagePath: 'assets/film/priest.png',
-        synopsis: 'A priest lives in a dystopian world ruled by the church...',
-        cast: 'Paul Bettany, Karl Urban', duration: '87 minutes', rating: '13+'),
-    Movie(title: 'Peaky Blinders', imagePath: 'assets/film/peakblinders.png',
-        synopsis: 'A gangster family epic set in 1900s England...',
-        cast: 'Cillian Murphy, Tom Hardy', duration: '60 minutes', rating: '17+'),
-    Movie(title: 'Gowok', imagePath: 'assets/film/Gowok.jpg',
-        synopsis: 'Sinopsis Gowok...', cast: 'Pemeran Gowok',
-        duration: '90 minutes', rating: '17+'),
-    Movie(title: 'Bangkitnya Mayit', imagePath: 'assets/film/Bangkitnya mayit.jpg',
-        synopsis: 'Film horor yang menegangkan...', cast: 'Pemeran film',
-        duration: '100 minutes', rating: '17+'),
-    Movie(title: 'Pangku', imagePath: 'assets/film/Pangku.jpg',
-        synopsis: 'Sinopsis Pangku...', cast: 'Pemeran Pangku',
-        duration: '90 minutes', rating: '17+'),
-    Movie(title: 'Sosok Ketiga', imagePath: 'assets/film/Sosok ketiga.jpg',
-        synopsis: 'Sinopsis Sosok Ketiga...', cast: 'Pemeran Sosok Ketiga',
-        duration: '95 minutes', rating: '13+'),
-    Movie(title: 'Syirik', imagePath: 'assets/film/Syirik.jpg',
-        synopsis: 'Sinopsis Syirik...', cast: 'Pemeran Syirik',
-        duration: '88 minutes', rating: '13+'),
-    Movie(title: 'The Nun', imagePath: 'assets/film/The nun.jpg',
-        synopsis: 'A priest investigates the haunting of a Romanian monastery...',
-        cast: 'Taissa Farmiga, Demián Bichir', duration: '96 minutes', rating: '17+'),
-    Movie(title: 'The Conjuring', imagePath: 'assets/film/The conjuring.jpg',
-        synopsis: 'Paranormal investigators Ed and Lorraine Warren...',
-        cast: 'Vera Farmiga, Patrick Wilson', duration: '112 minutes', rating: '17+'),
-  ];
+    final hardcodedMovies = [
+      Movie(
+          title: 'Gatotkaca',
+          imagePath: 'assets/film/Gatotkaca.jpg',
+          synopsis: 'Baru beberapa hari tinggal di apartemen...',
+          cast: 'Rizky Nazar, Yuki Kato',
+          duration: '119 minutes',
+          rating: '13+'),
+      Movie(
+          title: 'Priest',
+          imagePath: 'assets/film/priest.png',
+          synopsis:
+              'A priest lives in a dystopian world ruled by the church...',
+          cast: 'Paul Bettany, Karl Urban',
+          duration: '87 minutes',
+          rating: '13+'),
+      Movie(
+          title: 'Peaky Blinders',
+          imagePath: 'assets/film/peakblinders.png',
+          synopsis: 'A gangster family epic set in 1900s England...',
+          cast: 'Cillian Murphy, Tom Hardy',
+          duration: '60 minutes',
+          rating: '17+'),
+      Movie(
+          title: 'Gowok',
+          imagePath: 'assets/film/Gowok.jpg',
+          synopsis: 'Sinopsis Gowok...',
+          cast: 'Pemeran Gowok',
+          duration: '90 minutes',
+          rating: '17+'),
+      Movie(
+          title: 'Bangkitnya Mayit',
+          imagePath: 'assets/film/Bangkitnya mayit.jpg',
+          synopsis: 'Film horor yang menegangkan...',
+          cast: 'Pemeran film',
+          duration: '100 minutes',
+          rating: '17+'),
+      Movie(
+          title: 'Pangku',
+          imagePath: 'assets/film/Pangku.jpg',
+          synopsis: 'Sinopsis Pangku...',
+          cast: 'Pemeran Pangku',
+          duration: '90 minutes',
+          rating: '17+'),
+      Movie(
+          title: 'Sosok Ketiga',
+          imagePath: 'assets/film/Sosok ketiga.jpg',
+          synopsis: 'Sinopsis Sosok Ketiga...',
+          cast: 'Pemeran Sosok Ketiga',
+          duration: '95 minutes',
+          rating: '13+'),
+      Movie(
+          title: 'Syirik',
+          imagePath: 'assets/film/Syirik.jpg',
+          synopsis: 'Sinopsis Syirik...',
+          cast: 'Pemeran Syirik',
+          duration: '88 minutes',
+          rating: '13+'),
+      Movie(
+          title: 'The Nun',
+          imagePath: 'assets/film/The nun.jpg',
+          synopsis:
+              'A priest investigates the haunting of a Romanian monastery...',
+          cast: 'Taissa Farmiga, Demián Bichir',
+          duration: '96 minutes',
+          rating: '17+'),
+      Movie(
+          title: 'The Conjuring',
+          imagePath: 'assets/film/The conjuring.jpg',
+          synopsis:
+              'Paranormal investigators Ed and Lorraine Warren...',
+          cast: 'Vera Farmiga, Patrick Wilson',
+          duration: '112 minutes',
+          rating: '17+'),
+    ];
 
-  for (final movie in hardcodedMovies) {
-    await db.insert('movies', movie.toMap());
+    for (final movie in hardcodedMovies) {
+      final map = movie.toMap();
+      map['updatedAt'] = DateTime.now().millisecondsSinceEpoch;
+      await db.insert('movies', map);
+    }
   }
-}
 
   Future close() async {
     final db = await database;

@@ -34,16 +34,18 @@ class Movie {
   }
 
   // Create from Map (SQLite row)
-  factory Movie.fromMap(Map<String, dynamic> map) {
-    return Movie(
-      id: map['id'],
-      title: map['title'],
-      imagePath: map['imagePath'],
-      synopsis: map['synopsis'],
-      cast: map['cast'],
-      duration: map['duration'],
-      rating: map['rating'],
-      updatedAt: map['updatedAt']
-    );
-  }
+factory Movie.fromMap(Map<String, dynamic> map) {
+  return Movie(
+    id: map['id'],
+    title: map['title'],
+    imagePath: map['imagePath'],
+    synopsis: map['synopsis'],
+    cast: map['cast'],
+    duration: map['duration'],
+    rating: map['rating'],
+    updatedAt: map['updatedAt'] is int
+        ? map['updatedAt']
+        : int.tryParse(map['updatedAt'].toString()) ?? 0,
+  );
+}
 }
