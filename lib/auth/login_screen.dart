@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../database/database_helper.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -124,6 +125,10 @@ class _LoginPageState extends State<LoginScreen> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 20),
+
+                // --- Role Selection (User / Admin) ---
+                _buildRoleSelection(),
                 const SizedBox(height: 30),
 
                 // --- Tombol Login ---
@@ -213,6 +218,113 @@ class _LoginPageState extends State<LoginScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildRoleSelection() {
+    bool isAdmin = DatabaseHelper.instance.isAdmin;
+    return Row(
+      children: [
+        Expanded(
+          child: GestureDetector(
+            onTap: () {
+              setState(() {
+                DatabaseHelper.instance.isAdmin = false;
+              });
+            },
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: !isAdmin ? const Color(0xFFC79244) : Colors.white,
+                borderRadius: BorderRadius.circular(15),
+                border: Border.all(
+                  color: !isAdmin ? const Color(0xFFC79244) : Colors.grey.shade300,
+                  width: 1.5,
+                ),
+                boxShadow: !isAdmin
+                    ? [
+                        BoxShadow(
+                          color: const Color(0xFFC79244).withValues(alpha: 0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        )
+                      ]
+                    : [],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.person_outline_rounded,
+                    color: !isAdmin ? Colors.white : Colors.grey.shade600,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'User Mode',
+                    style: TextStyle(
+                      color: !isAdmin ? Colors.white : Colors.grey.shade700,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: GestureDetector(
+            onTap: () {
+              setState(() {
+                DatabaseHelper.instance.isAdmin = true;
+              });
+            },
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: isAdmin ? const Color(0xFFC79244) : Colors.white,
+                borderRadius: BorderRadius.circular(15),
+                border: Border.all(
+                  color: isAdmin ? const Color(0xFFC79244) : Colors.grey.shade300,
+                  width: 1.5,
+                ),
+                boxShadow: isAdmin
+                    ? [
+                        BoxShadow(
+                          color: const Color(0xFFC79244).withValues(alpha: 0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        )
+                      ]
+                    : [],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.admin_panel_settings_outlined,
+                    color: isAdmin ? Colors.white : Colors.grey.shade600,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Admin Mode',
+                    style: TextStyle(
+                      color: isAdmin ? Colors.white : Colors.grey.shade700,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

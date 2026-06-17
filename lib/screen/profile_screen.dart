@@ -34,7 +34,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             ElevatedButton(
               onPressed: () {
-                Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+                Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red.shade600,
@@ -126,7 +126,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
-                Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+                Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.indigo,
@@ -225,6 +225,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           userData['phone']!,
                           style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
                         ),
+                        const SizedBox(height: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: DatabaseHelper.instance.isAdmin ? const Color(0xFFFDF7E7) : Colors.indigo.shade50,
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(
+                              color: DatabaseHelper.instance.isAdmin ? const Color(0xFFC79244) : Colors.indigo.shade200,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                DatabaseHelper.instance.isAdmin ? Icons.admin_panel_settings_outlined : Icons.person_outline,
+                                size: 14,
+                                color: DatabaseHelper.instance.isAdmin ? const Color(0xFFC79244) : Colors.indigo.shade700,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                DatabaseHelper.instance.isAdmin ? 'Admin' : 'User',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: DatabaseHelper.instance.isAdmin ? const Color(0xFFC79244) : Colors.indigo.shade700,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -291,24 +321,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     icon: Icons.switch_account_outlined,
                     title: 'Ganti Akun',
                     onTap: _changeAccount,
-                  ),
-                  _buildMenuTile(
-                    icon: DatabaseHelper.instance.isAdmin ? Icons.person_outline : Icons.admin_panel_settings_outlined,
-                    title: DatabaseHelper.instance.isAdmin ? 'Ubah ke Mode User' : 'Ubah ke Mode Admin',
-                    onTap: () {
-                      setState(() {
-                        DatabaseHelper.instance.isAdmin = !DatabaseHelper.instance.isAdmin;
-                      });
-                      widget.onModeChanged?.call();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(DatabaseHelper.instance.isAdmin 
-                              ? 'Beralih ke Mode Admin' 
-                              : 'Beralih ke Mode User'),
-                          backgroundColor: Colors.indigo,
-                        ),
-                      );
-                    },
                   ),
                   _buildMenuTile(
                     icon: Icons.logout_rounded,
